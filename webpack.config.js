@@ -1,35 +1,36 @@
-const path = require("path");
+const path = require('path');
 
 module.exports = {
-  entry: "./src/index.tsx",
+  entry: './src/index.tsx',
   output: {
-    path: path.resolve(__dirname, "dist/"),
-    publicPath: "/dist/",
-    filename: "bundle.js",
+    path: path.resolve(__dirname, 'dist/'),
+    publicPath: '/dist/',
+    filename: 'bundle.js'
   },
-  mode: "development",
+  mode: 'development',
   module: {
     rules: [
       {
         test: /\.(ts|tsx)$/,
-        use: "ts-loader",
-        exclude: /node_modules/,
+        use: 'ts-loader',
+        exclude: /node_modules/
       },
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: "babel-loader",
+        use: 'babel-loader'
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"],
-      },
-    ],
+        use: ['style-loader', 'css-loader']
+      }
+    ]
   },
-  resolve: { extensions: ["*", ".ts", ".tsx", ".js", ".jsx"] },
+  resolve: { extensions: ['*', '.ts', '.tsx', '.js', '.jsx'] },
   devServer: {
     port: 3000,
-    open: true,
+    open: true
   },
+  devtool: 'eval-cheap-source-map'
   // plugins: [new webpack.HotModuleReplacementPlugin()],
 };
