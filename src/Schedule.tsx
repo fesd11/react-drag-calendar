@@ -27,10 +27,10 @@ const MonthEventsRow = styled.div`
 
 // TODO Длина ивента равная 0
 const events: CalendarEvent[] = [
-  { id: 1, start: 0, end: 5, duration: 5 },
-  { id: 2, start: 4, end: 5, duration: 1 },
-  { id: 4, start: 10, end: 12, duration: 2 },
-  { id: 3, start: 9, end: 11, duration: 2 }
+  { id: 1, start: 0, end: 5 },
+  { id: 2, start: 4, end: 5 },
+  { id: 4, start: 10, end: 12 },
+  { id: 3, start: 9, end: 11 }
 ];
 
 function isDayInInterval(day: number, start: number, end: number): boolean {
@@ -67,16 +67,21 @@ const EventsRow = ({
     ) {
       return findRowForEvent(event, grid, row + 1);
     }
-    for (let i = 0; i <= event.duration; i++) {
+    for (let i = 0; i <= event.end - event.start; i++) {
       grid[row][i + event.start - startWeek] = event;
     }
     return grid;
   }
 
-  const weekRows = rowEvents.reduce<EventGrid>((res, event) => {
-    const grid = findRowForEvent(event, res);
-    return grid;
-  }, {});
+  const weekRows = rowEvents
+    .sort((a, b) => {
+      const [durationA, durationB] = [a.end - a.start, b.end - b.start];
+      return durationB > durationA ? 1 : -1;
+    })
+    .reduce<EventGrid>((res, event) => {
+      const grid = findRowForEvent(event, res);
+      return grid;
+    }, {});
 
   return (
     <MonthEventsRow>
@@ -160,7 +165,17 @@ export const ScheduleTest = () => {
     itemTrigger: ItemTypes,
     position: number
   ): void {
-    console.log(event, itemTrigger, position);
+    setEvents((events) =>
+      events.map((oldEvent) => {
+        if (oldEvent.id === event.id) {
+          return {
+            ...oldEvent,
+            [itemTrigger]: position
+          };
+        }
+        return oldEvent;
+      })
+    );
   }
 
   return (

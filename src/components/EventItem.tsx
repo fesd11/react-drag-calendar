@@ -40,15 +40,10 @@ const EventItemStart = ({
   if (!context) {
     throw Error('Item must be in ScheduleContext');
   }
-  const [{ isDragging }, startDragRef] = useDrag(
+  const [{}, startDragRef] = useDrag(
     () => ({
       type: ItemTypes.START,
       item: event,
-      collect: (monitor) => {
-        return {
-          isDragging: !!monitor.isDragging()
-        };
-      },
       end: (item, monitor) => {
         const result = monitor.getDropResult() as CellDropResult;
         if (result) {
@@ -56,7 +51,7 @@ const EventItemStart = ({
         }
       }
     }),
-    [context]
+    [context, event]
   );
 
   return (
@@ -64,7 +59,7 @@ const EventItemStart = ({
       ref={startDragRef}
       style={{ left: cellIndex * 80, top: (rowIndex + 1) * 24 }}
     >
-      S {isDragging && 'isDragging'}
+      S
     </RangeButton>
   );
 };
@@ -78,25 +73,30 @@ const EventItemEnd = ({
   cellIndex: number;
   rowIndex: number;
 }) => {
-  const [{ isDragging }, endDragRef] = useDrag(() => ({
-    type: ItemTypes.END,
-    item: event,
-    collect: (monitor) => {
-      return {
-        isDragging: !!monitor.isDragging()
-      };
-    },
-    end: (item, monitor) => {
-      console.log(item, monitor.getDropResult());
-    }
-  }));
+  const context = useContext(ScheduleContext);
+  if (!context) {
+    throw Error('Item must be in ScheduleContext');
+  }
+  const [{}, endDragRef] = useDrag(
+    () => ({
+      type: ItemTypes.END,
+      item: event,
+      end: (item, monitor) => {
+        const result = monitor.getDropResult() as CellDropResult;
+        if (result) {
+          context.onEventChange(item, ItemTypes.END, result.position);
+        }
+      }
+    }),
+    [context, event]
+  );
 
   return (
     <RangeButton
       ref={endDragRef}
       style={{ left: cellIndex * 80, top: (rowIndex + 1) * 24 }}
     >
-      E {isDragging && 'isDragging'}
+      E
     </RangeButton>
   );
 };
